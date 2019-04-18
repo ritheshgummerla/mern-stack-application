@@ -58,6 +58,18 @@ class SelectedItem extends React.Component {
             </span>
           </ListItem>
         </Link>
+        <Link to="/ifile" className="link">
+          <ListItem
+            button
+            selected={this.state.selectedIndex === 3}
+            onClick={event => this.handleListItemClick(event, 3)}
+          >
+            <i className="fa fa-line-chart" />
+            <span className="navText">
+              IFile
+            </span>
+          </ListItem>
+        </Link>
         
         {/* : ""} */}
         {/* <Link to="/Map" className="link">

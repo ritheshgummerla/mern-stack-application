@@ -1,4 +1,8 @@
 import React, { Component } from "react";
+import Paper from "@material-ui/core/Paper";
+import Dropzone from "react-dropzone";
+import { AtomSpinner } from "react-epic-spinners";
+import { Link } from "react-router-dom";
 import {
   Grid,
   Table,
@@ -7,20 +11,37 @@ import {
 import Button from "@material-ui/core/Button";
 import { OutTable, ExcelRenderer } from "react-excel-renderer";
 
-export default class ifile extends Component {
+class Ifile extends Component {
   state = {
     columns: [
       { name: "key", title: "Object Key" },
       { name: "Id", title: "Object Type ID" }
     ],
     rows: [],
+    spinner: false
   };
 
-  fileHandler = event => {
-    let fileObj = event.target.files[0];
+  fileHandler = acceptedFile => {
+    let fileObj = acceptedFile[0];
+    console.log(fileObj.type);
+    if (
+      fileObj.type !==
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" &&
+      fileObj.type !== "application/vnd.ms-excel"
+    ) {
+      this.setState({
+        errorMsg: "Please select only .xlsx or .csv files"
+      });
+      return;
+    }
+
+    this.setState({
+      spinner: true,
+      errorMsg: ""
+    });
+
     ExcelRenderer(fileObj, (err, resp) => {
       let newRows = [];
-
       let obj = {};
       if (err) {
         console.log(err);
@@ -30,42 +51,77 @@ export default class ifile extends Component {
             key: item[0],
             Id: item[1]
           };
-          //newRows.push([{key:obj[0],Id:obj[1]}])
           newRows.push(obj);
         });
-        console.log(newRows);
         this.setState({
-          //cols:resp.cols,
-          rows: newRows
+          rows: newRows,
+          spinner: false
         });
       }
     });
   };
 
+  validate = rows => {
+    let key = [];
+    rows.filter(tem => {
+      key.push(tem.key);
+    });
+    console.log(key);
+  };
+
   render() {
     const { rows, columns } = this.state;
-    console.log(this.state.rows);
+    if (this.state.spinner) {
+      return (
+        <AtomSpinner style={{ margin: "auto" }} size="100" color=" #003366" />
+      );
+    }
     return (
-      <div>
-        <input
-          type="file"
-          onChange={this.fileHandler}
-          style={{ padding: "10px" }}
-        />
-        {this.state.rows.length!==0 ? (
-          <div  style={{width:"500px"}}>
-            <Grid rows={rows} columns={columns}>
-              <Table />
-              <TableHeaderRow />
-            </Grid>
-            <Button onClick={this.add} variant="contained" color="primary">
+      <div className="App">
+        <Dropzone onDrop={this.fileHandler}>
+          {({ getRootProps, getInputProps }) => (
+            <section>
+              <div
+                {...getRootProps()}
+                style={{
+                  margin: "auto",
+                  width: "520px",
+                  padding: "10px",
+                  border: "1px dotted gray"
+                }}
+              >
+                <input
+                  {...getInputProps()}
+                  accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+                />
+                <p>Drop file here, or click to select file</p>
+              </div>
+            </section>
+          )}
+        </Dropzone>
+        {this.state.errorMsg ? (
+          <p style={{ color: "red" }}>{this.state.errorMsg}</p>
+        ) : (
+          <div style={{ width: "520px", margin: "auto" }}>
+            <Paper>
+              <Grid rows={rows} columns={columns}>
+                <Table />
+                <TableHeaderRow />
+              </Grid>
+            </Paper>
+            <Button
+              style={{ margin: "10px" }}
+              onClick={this.validate.bind(this, rows)}
+              variant="contained"
+              color="primary"
+            >
               Validate
             </Button>
           </div>
-        ) : (
-          ""
         )}
       </div>
     );
   }
 }
+
+export default Ifile;
