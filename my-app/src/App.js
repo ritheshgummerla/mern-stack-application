@@ -8,29 +8,29 @@ import Admin from "./components/admin";
 import UserList from "./components/UserList";
 import { connect } from "react-redux";
 import Button from "@material-ui/core/Button";
-import Home from "./components/home"
+import Home from "./components/home";
 import Header from "./components/Header";
-import Register from './register/register'
+import { AtomSpinner } from "react-epic-spinners";
+import Register from "./register/register";
 import { MuiThemeProvider, createMuiTheme } from "@material-ui/core/styles";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import Wrapper from "./components/Wrapper";
 import { Provider } from "react-redux";
 import "font-awesome/css/font-awesome.min.css";
-import Grid from '@material-ui/core/Grid';
-import SideMenu from "./components/sidemenu"
-import store from "./store/index"
-import {Auth} from "./auth/auth"
-import Ifile from './components/ifile'
+import Grid from "@material-ui/core/Grid";
+import SideMenu from "./components/sidemenu";
+import store from "./store/index";
+import { Auth } from "./auth/auth";
+import Ifile from "./components/ifile";
 import TextField from "@material-ui/core/TextField";
-import Login from "./login/login"
-let token =""
-console.log(token)
+import Login from "./login/login";
+let token = "";
+console.log(token);
 const theme = createMuiTheme({
   typography: {
     useNextVariants: true
   },
   palette: {
-    
     primary: {
       main: "rgb(39,49,66)"
     },
@@ -43,12 +43,13 @@ const theme = createMuiTheme({
   }
 });
 
-    let userToken =localStorage.getItem('token')
-console.log(userToken)
+let userToken = localStorage.getItem("token");
+console.log(userToken);
 const AuthButton = withRouter(({ history }) =>
   Auth.isAuthenticated ? (
     <p>
-      <Button variant="contained"
+      <Button
+        variant="contained"
         onClick={() => {
           Auth.signout(() => history.push("/"));
         }}
@@ -58,12 +59,11 @@ const AuthButton = withRouter(({ history }) =>
     </p>
   ) : (
     <div>
-    {/* <p>You are not logged in. <Button variant="contained"><Link to ="/login">login</Link></Button></p> */}
-    {/* <span style={{border:"1px solid gray",padding:'10px'}}>email: test, password:1234</span> */}
+      {/* <p>You are not logged in. <Button variant="contained"><Link to ="/login">login</Link></Button></p> */}
+      {/* <span style={{border:"1px solid gray",padding:'10px'}}>email: test, password:1234</span> */}
     </div>
   )
 );
-
 
 // class login extends Component {
 //   state = {
@@ -135,62 +135,43 @@ const AuthButton = withRouter(({ history }) =>
 //   }
 // }
 
-
 class App extends Component {
   render() {
-    token=this.props.data.admin.token
-    console.log(this.props.data.admin.token)
+    token = this.props.data.admin.token;
+    console.log(this.props.data.admin.token);
     const { loading } = this.props.data.admin;
     if (loading) {
       return (
-        <div className="App">
-          <img src={logo} alt="img" width="200px" height="200px" />
-        </div>
+        <AtomSpinner style={{ margin: "auto" }} size="100" color=" #003366" />
       );
     }
     return (
       <Router history={history}>
-      
-
-      
-  <MuiThemeProvider theme={theme}>
-    <CssBaseline />
-    <Provider store={store}>
-      <Wrapper>
-      <Header />
-    <Grid container style={{height:'100%'}}>
-    <Grid item md={2}>
-    <SideMenu/>
-    </Grid>
-    <Grid item md={10}>
-    
-          {/* <AuthButton /> */}
-          <h3 />
-          <PrivateRoute exact path="/" component={Home} />
-          <PrivateRoute exact path="/dashboard" component={Dashboard} />
-          {/* <Route exact path="/admin" component={Admin} /> */}
-          <PrivateRoute exact path="/userlist" component={UserList} />
-          <Route exact path="/login" component={Login} />
-          <Route exact path="/register" component={Register} />
-          <Route exact path="/ifile" component={Ifile} />
-          <PrivateRoute exact path="/admin" component={Admin} />
-        </Grid>
-    </Grid>
-      </Wrapper>
-    </Provider>
-  </MuiThemeProvider>
-
-
-
-
-
-
-
-
-
-
-
-
+        <MuiThemeProvider theme={theme}>
+          <CssBaseline />
+          <Provider store={store}>
+            <Wrapper>
+              <Header />
+              <Grid container style={{ height: "100%" }}>
+                <Grid item md={2}>
+                  <SideMenu />
+                </Grid>
+                <Grid item md={10}>
+                  {/* <AuthButton /> */}
+                  <h3 />
+                  <PrivateRoute exact path="/" component={Home} />
+                  <PrivateRoute exact path="/dashboard" component={Dashboard} />
+                  {/* <Route exact path="/admin" component={Admin} /> */}
+                  <PrivateRoute exact path="/userlist" component={UserList} />
+                  <Route exact path="/login" component={Login} />
+                  <Route exact path="/register" component={Register} />
+                  <Route exact path="/ifile" component={Ifile} />
+                  <PrivateRoute exact path="/admin" component={Admin} />
+                </Grid>
+              </Grid>
+            </Wrapper>
+          </Provider>
+        </MuiThemeProvider>
       </Router>
     );
   }
@@ -205,14 +186,7 @@ const PrivateRoute = ({ component: Component, ...rest }) => (
   <Route
     {...rest}
     render={props =>
-      token ? ( 
-        
-        <Component {...props} />
-      ) : (
-        <Redirect
-          to='/login'
-        />
-      )
+      token ? <Component {...props} /> : <Redirect to="/login" />
     }
   />
 );
